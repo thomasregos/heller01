@@ -23,6 +23,7 @@ class Diak(Ember):
         self.oszt = oszt
         self.atl = atl
         self.parent = parent
+        self.oszt.diakok.update({self.name: self})
 
 
 class Tanar(Ember):
@@ -35,22 +36,51 @@ class Tanar(Ember):
         self.ofo = ofo
         if self.ofo:
             self.oszt = oszt
+        else:
+            self.oszt = None
 
     def fizu(self):
         print(self.hetiora*4*self.oraber)
         return self.hetiora*4*self.oraber
 
 
+class evfolyam():
+    def __init__(self):
+        self.osztalyok = {}
+
+
+class osztaly():
+    def __init__(self, evfolyam, osztalynev):
+        self.evfolyam = evfolyam
+        self.osztalyn = osztalynev
+        self.evfolyam.osztalyok.update({self.osztalyn: self})
+        self.diakok = {}
+
+evfolyam1 = evfolyam()
+evfolyam2 = evfolyam()
+
+osztaly1A = osztaly(evfolyam1, 'A')
+osztaly1B = osztaly(evfolyam1, 'B')
+
+osztaly2A = osztaly(evfolyam2, 'A')
+osztaly2B = osztaly(evfolyam2, 'B')
 
 
 
 
 
+Diak1 = Diak(osztaly1A, 3, "PJesus", "Jozsi", 1996, "Male")
+Diak2 = Diak(osztaly1B, 3.45, "PMaria", "Jose", 1995, "Male")
+Diak3 = Diak(osztaly2A, 2.11, "PKaroly", "Felicia", 1997, "Female")
+Diak4 = Diak(osztaly2B, 3.14, "PEzio", "Napsugar", 1996, "Female")
+Diak5 = Diak(osztaly1A, 4.5, "PAlma", "Mano", 1995, "Male")
+# Diak6 = Diak(osztaly1A, 3, "Karoly", "Jozsi", 1996, "Male")
+# Diak7 = Diak(osztaly1A, 3, "Karoly", "Jozsi", 1996, "Male")
+# Diak8 = Diak(osztaly1A, 3, "Karoly", "Jozsi", 1996, "Male")
+
+Diak1.age21()
 
 
 
-
-aaa = Diak(12, 3, "Apa", "Jozsi", 1996, "Male")
-
-aaa.age21()
-
+# van ismetlodes körbe körbe mehetsz a oszt--diakok--diak--oszt
+# de muszaj az evfolyamot is atadni mert kulonben nem lehet updatelni kezdjuk ott
