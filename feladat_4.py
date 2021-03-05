@@ -25,7 +25,9 @@ class Tantargy:
         self.diakok = {}
         for evfoly in evf:
             self.evfolyam.update({evfoly.name: evfoly})
+            # it is stored on which years this subject is taught
             self.diakok.update(evfoly.diakok)
+            # the students learning this subject is derived from the subjects of the years students
 
 
 class Diak(Ember):
@@ -35,7 +37,10 @@ class Diak(Ember):
         self.atl = atl
         self.parent = parent
         self.oszt.diakok.update({self.name: self})
+        # student will be added to the students of the class
         self.oszt.evfolyam.diakok.update({self.name: self})
+        # student will be added to the students of the year
+
 
 
 class Tanar(Ember):
@@ -51,10 +56,13 @@ class Tanar(Ember):
         self.diakok = {}
         for tantargy in tantargyak:
             self.tantargyak.update({tantargy.name: tantargy})
+            # he/she can teach many subjects
             self.diakok.update(tantargy.diakok)
+            # the students learning his subjects will be stored as his students
 
         self.ofo = ofo
         if self.ofo:
+            # if he/she is a osztalyfonok than he/she has a class
             self.oszt = oszt
             self.oszt.ofo = self
         else:
@@ -75,7 +83,6 @@ class Tanar(Ember):
 
     def atlag_tantargy(self):
         # returns the mean of the subjects the teacher teaches
-        # atlag_l = [self.diakok[i].atl for i in self.diakok.keys()]
         atlag_l = []
         for tantargy, t_value in self.tantargyak.items():
             for evfolyam, e_value in t_value.evfolyam.items():
@@ -97,8 +104,8 @@ class Osztaly():
         self.evfolyam = evfolyam
         self.osztalyn = osztalynev
         self.evfolyam.osztalyok.update({self.osztalyn: self})
+        # the class is added to the corresponding years classes
         self.diakok = {}
-        # self.tantargyak = {}
         self.ofo = None
 
 
@@ -115,6 +122,7 @@ class Igazgato(Tanar):
     def fizuu(self):
         normal = self.fizu()
         # print(normal+self.bonusz)
+        # fizu gives us the monthly wage based on hourly wage then the bonus is added
         return normal+self.bonusz
 
 
@@ -136,8 +144,10 @@ class Iskola():
         salary = 0
         for tanar in self.tanarok:
             salary += self.tanarok[tanar].fizu()
+            # using the fizu we sum up the teachers salary
 
         salary += self.igazgato.fizuu()
+        # there is only one headmaster and her/his salary is added
 
         return salary
 
@@ -151,6 +161,7 @@ class Iskola():
     def best_studs(self):
         # legjobb diakokat tanito tanar
         atlagok = self.tantargy_atlagok()
+        # the averages of the students taught by each teacher
 
         return max(atlagok, key=atlagok.get)
 
