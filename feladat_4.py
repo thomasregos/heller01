@@ -28,10 +28,6 @@ class Tantargy:
             self.diakok.update(evfoly.diakok)
 
 
-
-
-
-
 class Diak(Ember):
     def __init__(self, oszt, atl, parent, name, birthy, gender):
         super().__init__(name, birthy, gender)
@@ -64,9 +60,8 @@ class Tanar(Ember):
         else:
             self.oszt = None
 
-
     def fizu(self):
-        print(self.hetiora*4*self.oraber)
+        # print(self.hetiora*4*self.oraber)
         return self.hetiora*4*self.oraber
 
     def atlag_osztaly(self):
@@ -74,25 +69,20 @@ class Tanar(Ember):
         if not self.ofo:
             return None
 
-        atlag_l = []
-        for diak in self.oszt.diakok.keys():
-            atlag_l.append(self.oszt.diakok[diak].atl)
-
-        # TODO: list comprehension
+        atlag_l = [self.oszt.diakok[diak].atl for diak in self.oszt.diakok.keys()]
 
         return mean(atlag_l)
 
     def atlag_tantargy(self):
         # returns the mean of the subjects the teacher teaches
-
-        # atlag_l = [i.atl for i in self.diakok.items()]
+        # atlag_l = [self.diakok[i].atl for i in self.diakok.keys()]
         atlag_l = []
-        for diak in self.diakok.keys():
-            atlag_l.append(self.diakok[diak].atl)
+        for tantargy, t_value in self.tantargyak.items():
+            for evfolyam, e_value in t_value.evfolyam.items():
+                for diak, d_value in e_value.diakok.items():
+                    atlag_l.append(d_value.atl)
 
         return mean(atlag_l)
-
-
 
 
 class Evfolyam():
@@ -108,6 +98,7 @@ class Osztaly():
         self.osztalyn = osztalynev
         self.evfolyam.osztalyok.update({self.osztalyn: self})
         self.diakok = {}
+        # self.tantargyak = {}
         self.ofo = None
 
 
@@ -123,8 +114,51 @@ class Igazgato(Tanar):
 
     def fizuu(self):
         normal = self.fizu()
-        print(normal+self.bonusz)
+        # print(normal+self.bonusz)
         return normal+self.bonusz
+
+
+class Iskola():
+    def __init__(self, tanarok, diakok, igazgato):
+        self.tanarok = {}
+        self.diakok = {}
+        self.igazgato = igazgato
+
+        # Tanarok
+        for tanar in tanarok:
+            self.tanarok.update({tanar.name: tanar})
+
+        # Diakok
+        for diak in diakok:
+            self.diakok.update({diak.name: diak})
+
+    def sum_salary(self):
+        salary = 0
+        for tanar in self.tanarok:
+            salary += self.tanarok[tanar].fizu()
+
+        salary += self.igazgato.fizuu()
+
+        return salary
+
+    def tantargy_atlagok(self):
+        # Tanarok altal tanitott targyakat tanulo diakok atlagai
+        # Dict ahol a kulcsok a tanár nevei az érték pedig az általuk tanított diákok átlagainak átlaga
+        atlagok = {tanar: self.tanarok[tanar].atlag_tantargy() for tanar in self.tanarok.keys()}
+
+        return atlagok
+
+    def best_studs(self):
+        # legjobb diakokat tanito tanar
+        atlagok = self.tantargy_atlagok()
+
+        return max(atlagok, key=atlagok.get)
+
+    def worst_stud(self):
+
+        atlagok = {diak: values.atl for (diak, values) in self.diakok.items()}
+
+        return min(atlagok, key=atlagok.get)
 
 
 evfolyam1 = Evfolyam('11')
@@ -156,30 +190,56 @@ Tanar3 = Tanar('Anita', 1975, 'Female', [Tantargy2], 40, 950, False)
 
 igazgato = Igazgato(88000, 'Eva', 1983, 'Female', [], 55, 1400, False)
 
-igazgato.fizuu()
-
-aaa=Tanar1.atlag_osztaly()
-print(aaa)
-
-aaa = Tanar2.atlag_tantargy()
-print(aaa)
+Iskola = Iskola([Tanar1, Tanar2, Tanar3], [Diak1, Diak2, Diak3, Diak4, Diak5,
+                                           Diak6, Diak7, Diak8, Diak9, Diak10], igazgato)
 
 
-Diak1.age21()
+# salaries
+for tanar, values in Iskola.tanarok.items():
+    print("{tnr} receives {sal} Ft monthly".format(tnr=tanar, sal=values.fizu()))
+
+print("The head master is stacked as f*ck monthly: {sal} Ft".format(sal=Iskola.igazgato.fizuu()))
+print("The full salaries paid by the school monthly is {sal} Ft".format(sal=Iskola.sum_salary()))
+
+# academic results
+best_teacher = Iskola.best_studs()
+print("{tch} has the best students with an average of {avg}".format(tch=best_teacher,
+                                                                    avg=Iskola.tanarok[best_teacher].atlag_tantargy()))
+print("{std} needs the most practice".format(std=Iskola.worst_stud()))
+
+print("\nNew year new people:")
+
+# Newcomers
+Diak11 = Diak(osztaly2A, 1.8, "PMichael", "Puccini", 1996, "Male")
+# this will lower Guyri's avg and also he will be the worst student to see if the Iskola is really updated
+Diak12 = Diak(osztaly2B, 3.2, "PKaffka", "Amelia", 1998, "Female")
+Diak13 = Diak(osztaly1A, 4.95, "PHaydn", "Bach", 1997, "Male")
+Diak14 = Diak(osztaly1B, 4.1, "PVivaldi", "Katalin", 1995, "Female")
+
+Tanar4 = Tanar('Dora', 1980, 'Female', [Tantargy2, Tantargy3], 40, 1080, False)
+
+Iskola.diakok.update({Diak11.name: Diak11})
+Iskola.diakok.update({Diak12.name: Diak12})
+Iskola.diakok.update({Diak13.name: Diak13})
+Iskola.diakok.update({Diak14.name: Diak14})
+
+Iskola.tanarok.update({Tanar4.name: Tanar4})
+
+# salaries
+for tanar, values in Iskola.tanarok.items():
+    print("{tnr} receives {sal} Ft monthly".format(tnr=tanar, sal=values.fizu()))
+
+print("The head master is stacked as f*ck monthly: {sal} Ft".format(sal=Iskola.igazgato.fizuu()))
+print("The full salaries paid by the school monthly is {sal} Ft".format(sal=Iskola.sum_salary()))
+
+# academic results
+best_teacher = Iskola.best_studs()
+print("{tch} has the best students with an average of {avg}".format(tch=best_teacher,
+                                                                    avg=Iskola.tanarok[best_teacher].atlag_tantargy()))
+print("{std} needs the most practice".format(std=Iskola.worst_stud()))
 
 
 
 
-
-
-
-
-
-
-
-
-
-# van ismetlodes körbe körbe mehetsz a oszt--diakok--diak--oszt
-# de muszaj az evfolyamot is atadni mert kulonben nem lehet updatelni kezdjuk ott
 
 # attributomokat nem lehet valahogy atadni a parent classbol hogy ugyanugy bekerje es ugyanazt csinalja vele?
